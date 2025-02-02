@@ -22,7 +22,15 @@ export const menuItems: PizzaItem[] = [
     name: "Portuguesa",
     description: "Molho de tomate, mussarela, presunto, ovos, cebola",
     price: 52.90,
-    image: "/api/placeholder/200/200",
+    image: "src/images/portuguesa.jpg",
+    category: "Especiais"
+  },
+  {
+    id: 4,
+    name: "Moda Da Casa",
+    description: "Molho de tomate, mussarela, presunto, ovos, cebola, bacon, azeitonas",
+    price: 54.90,
+    image: "src/images/modadacasa.jpg",
     category: "Especiais"
   },
   {
@@ -30,7 +38,7 @@ export const menuItems: PizzaItem[] = [
     name: "Quatro Queijos",
     description: "Mussarela, gorgonzola, parmesão e provolone",
     price: 54.90,
-    image: "/api/placeholder/200/200",
+    image: "src/images/quatroqueijos.jpg",
     category: "Especiais"
   }
 ];

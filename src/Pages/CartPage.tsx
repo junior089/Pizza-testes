@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { AppContext } from '../context/AppContext';
+import { AppContext } from '../Context/AppContext';
 import { CartItem as CartItemComponent } from '../components/CartItem';
 import { OrderSummary } from '../components/OrderSummary';
 
