@@ -31,7 +31,7 @@ export const menuItems: PizzaItem[] = [
     description: "Molho de tomate, mussarela, presunto, ovos, cebola, bacon, azeitonas",
     price: 54.90,
     image: "src/images/modadacasa.jpg",
-    category: "Especiais"
+    category: "Clássicas"
   },
   {
     id: 4,
@@ -40,5 +40,45 @@ export const menuItems: PizzaItem[] = [
     price: 54.90,
     image: "src/images/quatroqueijos.jpg",
     category: "Especiais"
-  }
+  },
+  {
+    id: 5,
+    name: "Frango com Catupiry",
+    description: "Molho de tomate, mussarela, frango desfiado, catupiry",
+    price: 54.90,
+    image: "src/images/frangocomcatupiry.jpg",
+    category: "Especiais"
+  },
+  {
+    id: 6,
+    name: "Calabresa",
+    description: "Molho de tomate, mussarela, calabresa, cebola",
+    price: 49.90,
+    image: "src/images/calabresa.jpg",
+    category: "Clássicas"
+  },
+  {
+    id: 7,
+    name: "Vegetariana",
+    description: "Molho de tomate, mussarela, palmito, tomate, pimentão, cebola, azeitonas",
+    price: 54.90,
+    image: "src/images/vegetariana.jpg",
+    category: "Especiais"
+  },
+  {
+    id: 8,
+    name: "Chocolate",
+    description: "Chocolate ao leite, chocolate branco, morango, kiwi, uva",
+    price: 49.90,
+    image: "src/images/chocolate.jpg",
+    category: "Doces"
+  },
+  {
+    id: 9,
+    name: "Banana com Canela",
+    description: "Banana, canela, chocolate ao leite",
+    price: 49.90,
+    image: "src/images/bananacanela.jpg",
+    category: "Doces"
+  },
 ];
