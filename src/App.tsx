@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, createContext, useContext, useCallback } from 'react';
 import { Sun, Moon, Pizza, ShoppingCart, Plus, Minus, Home, Info, Menu, X } from 'lucide-react';
 
 // Types
@@ -13,53 +13,75 @@ interface PizzaItem {
 
 type Page = 'home' | 'menu' | 'about' | 'cart';
 
+interface CartItem {
+  item: PizzaItem;
+  quantity: number;
+}
+
+interface AppContextType {
+  darkMode: boolean;
+  setDarkMode: (darkMode: boolean) => void;
+  currentPage: Page;
+  setCurrentPage: (page: Page) => void;
+  cartItems: CartItem[];
+  addToCart: (pizza: PizzaItem) => void;
+  removeFromCart: (pizzaId: number) => void;
+}
+
+const AppContext = createContext<AppContextType | undefined>(undefined);
+
 // Components
-const Header = ({ darkMode, setDarkMode, setCurrentPage, cartItemsCount }: any) => (
-  <header className={`fixed w-full z-50 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md`}>
-    <div className="container mx-auto px-4">
-      <div className="flex justify-between items-center h-16">
-        <div className="flex items-center space-x-2">
-          <Pizza className="h-8 w-8" />
-          <h1 className="text-2xl font-bold">Pizzamar</h1>
-        </div>
-        <nav className="hidden md:flex space-x-8">
-          <button onClick={() => setCurrentPage('home')} className="hover:text-green-500">Home</button>
-          <button onClick={() => setCurrentPage('menu')} className="hover:text-green-500">Cardápio</button>
-          <button onClick={() => setCurrentPage('about')} className="hover:text-green-500">Sobre</button>
-          <button onClick={() => setCurrentPage('cart')} className="relative hover:text-green-500">
-            <ShoppingCart className="h-6 w-6" />
-            {cartItemsCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
-                {cartItemsCount}
-              </span>
-            )}
-          </button>
-        </nav>
-        <div className="flex items-center space-x-4">
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
-          >
-            {darkMode ? <Sun className="h-6 w-6" /> : <Moon className="h-6 w-6" />}
-          </button>
+const Header = () => {
+  const { darkMode, setDarkMode, setCurrentPage, cartItems } = useContext(AppContext)!;
+  const cartItemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  return (
+    <header className={`fixed w-full z-50 ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md`}>
+      <div className="container mx-auto px-4">
+        <div className="flex justify-between items-center h-16">
+          <div className="flex items-center space-x-2">
+            <Pizza className="h-8 w-8" />
+            <h1 className="text-2xl font-bold">Pizzamar</h1>
+          </div>
+          <nav className="hidden md:flex space-x-8">
+            <button onClick={() => setCurrentPage('home')} className="hover:text-green-500">Home</button>
+            <button onClick={() => setCurrentPage('menu')} className="hover:text-green-500">Cardápio</button>
+            <button onClick={() => setCurrentPage('about')} className="hover:text-green-500">Sobre</button>
+            <button onClick={() => setCurrentPage('cart')} className="relative hover:text-green-500">
+              <ShoppingCart className="h-6 w-6" />
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">
+                  {cartItemsCount}
+                </span>
+              )}
+            </button>
+          </nav>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+            >
+              {darkMode ? <Sun className="h-6 w-6" /> : <Moon className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  </header>
-);
+    </header>
+  );
+};
 
 const HomePage = () => (
   <div className="space-y-16">
     {/* Hero Section */}
     <div className="relative h-screen">
       <img
-        src="/api/placeholder/1920/1080"
+        src="src\images\pizza.png"
         alt="Pizza Hero"
         className="w-full h-full object-cover"
       />
       <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
         <div className="text-center text-white">
-          <h1 className="text-5xl font-bold mb-4">Bem-vindo à Pizzaria Delícia</h1>
+          <h1 className="text-5xl font-bold mb-4">Bem-vindo à Pizzamar</h1>
           <p className="text-xl mb-8">As melhores pizzas artesanais da cidade</p>
           <button className="bg-green-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-green-600">
             Ver Cardápio
@@ -103,13 +125,13 @@ const AboutPage = () => (
       <h2 className="text-3xl font-bold mb-8 text-center">Nossa História</h2>
       <div className="grid md:grid-cols-2 gap-8 items-center">
         <img
-          src="/api/placeholder/600/400"
+          src="src\images\pizza.png"
           alt="Nossa História"
           className="rounded-lg shadow-lg"
         />
         <div>
           <p className="mb-4">
-            Fundada em 1990, a Pizzaria Delícia nasceu do sonho de criar as melhores pizzas artesanais da cidade.
+            Fundada em 1990, a Pizzamar nasceu do sonho de criar as melhores pizzas artesanais da cidade.
             Com receitas tradicionais italianas passadas de geração em geração, nos dedicamos a oferecer uma
             experiência gastronômica única.
           </p>
@@ -128,9 +150,11 @@ const AboutPage = () => (
   </div>
 );
 
-const CartPage = ({ cartItems, removeFromCart, darkMode }: any) => {
+const CartPage = () => {
+  const { cartItems, removeFromCart, darkMode } = useContext(AppContext)!;
+
   const totalPrice = cartItems.reduce(
-    (sum: number, item: any) => sum + item.item.price * item.quantity,
+    (sum: number, item: CartItem) => sum + item.item.price * item.quantity,
     0
   );
 
@@ -142,7 +166,7 @@ const CartPage = ({ cartItems, removeFromCart, darkMode }: any) => {
       ) : (
         <div className="grid md:grid-cols-3 gap-8">
           <div className="md:col-span-2 space-y-4">
-            {cartItems.map(({ item, quantity }: any) => (
+            {cartItems.map(({ item, quantity }) => (
               <div
                 key={item.id}
                 className={`${
@@ -206,14 +230,16 @@ const CartPage = ({ cartItems, removeFromCart, darkMode }: any) => {
   );
 };
 
-const MenuPage = ({ addToCart, darkMode }: any) => {
+const MenuPage = () => {
+  const { addToCart, darkMode } = useContext(AppContext)!;
+
   const [menuItems] = useState<PizzaItem[]>([
     {
       id: 1,
       name: "Margherita",
       description: "Molho de tomate, mussarela, manjericão fresco",
       price: 45.90,
-      image: "/api/placeholder/200/200",
+      image: "src\images\margerita.png",
       category: "Clássicas"
     },
     {
@@ -221,7 +247,7 @@ const MenuPage = ({ addToCart, darkMode }: any) => {
       name: "Pepperoni",
       description: "Molho de tomate, mussarela, pepperoni",
       price: 49.90,
-      image: "/api/placeholder/200/200",
+      image: ".\src\images\pepperoni.jpg",
       category: "Clássicas"
     },
     {
@@ -290,9 +316,9 @@ const MenuPage = ({ addToCart, darkMode }: any) => {
 const PizzariaApp = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [currentPage, setCurrentPage] = useState<Page>('home');
-  const [cartItems, setCartItems] = useState<{item: PizzaItem; quantity: number}[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  const addToCart = (pizza: PizzaItem) => {
+  const addToCart = useCallback((pizza: PizzaItem) => {
     setCartItems(prev => {
       const exists = prev.find(item => item.item.id === pizza.id);
       if (exists) {
@@ -304,9 +330,9 @@ const PizzariaApp = () => {
       }
       return [...prev, { item: pizza, quantity: 1 }];
     });
-  };
+  }, []);
 
-  const removeFromCart = (pizzaId: number) => {
+  const removeFromCart = useCallback((pizzaId: number) => {
     setCartItems(prev => {
       const exists = prev.find(item => item.item.id === pizzaId);
       if (exists && exists.quantity > 1) {
@@ -318,66 +344,50 @@ const PizzariaApp = () => {
       }
       return prev.filter(item => item.item.id !== pizzaId);
     });
-  };
-
-  const cartItemsCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  }, []);
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
-      <Header
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
-        setCurrentPage={setCurrentPage}
-        cartItemsCount={cartItemsCount}
-      />
-      <div className="pt-16">
-        {currentPage === 'home' && <HomePage />}
-        {currentPage === 'about' && <AboutPage />}
-        {currentPage === 'menu' && (
-          <MenuPage
-            addToCart={addToCart}
-            darkMode={darkMode}
-          />
-        )}
-        {currentPage === 'cart' && (
-          <CartPage
-            cartItems={cartItems}
-            removeFromCart={removeFromCart}
-            darkMode={darkMode}
-          />
-        )}
-      </div>
-      
-      {/* Footer */}
-      <footer className={`${darkMode ? 'bg-gray-800' : 'bg-gray-200'} mt-16`}>
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid md:grid-cols-3 gap-8">
-            <div>
-              <h3 className="text-lg font-bold mb-4">Horário de Funcionamento</h3>
-              <p>Segunda a Sexta: 18h às 23h</p>
-              <p>Sábado e Domingo: 18h às 00h</p>
-            </div>
-            <div>
-              <h3 className="text-lg font-bold mb-4">Contato</h3>
-              <p>Telefone: (11) 99999-9999</p>
-              <p>Email: contato@pizzariadelicia.com</p>
-              <p>Endereço: Rua das Pizzas, 123</p>
-            </div>
-            <div>
-              <h3 className="text-lg font-bold mb-4">Redes Sociais</h3>
-              <div className="flex space-x-4">
-                <a href="#" className="hover:text-green-500">Instagram</a>
-                <a href="#" className="hover:text-green-500">Facebook</a>
-                <a href="#" className="hover:text-green-500">Twitter</a>
+    <AppContext.Provider value={{ darkMode, setDarkMode, currentPage, setCurrentPage, cartItems, addToCart, removeFromCart }}>
+      <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'}`}>
+        <Header />
+        <div className="pt-16">
+          {currentPage === 'home' && <HomePage />}
+          {currentPage === 'about' && <AboutPage />}
+          {currentPage === 'menu' && <MenuPage />}
+          {currentPage === 'cart' && <CartPage />}
+        </div>
+        
+        {/* Footer */}
+        <footer className={`${darkMode ? 'bg-gray-800' : 'bg-gray-200'} mt-16`}>
+          <div className="container mx-auto px-4 py-8">
+            <div className="grid md:grid-cols-3 gap-8">
+              <div>
+                <h3 className="text-lg font-bold mb-4">Horário de Funcionamento</h3>
+                <p>Segunda a Sexta: 18h às 23h</p>
+                <p>Sábado e Domingo: 18h às 00h</p>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold mb-4">Contato</h3>
+                <p>Telefone: (11) 99999-9999</p>
+                <p>Email: contato@pizzariadelicia.com</p>
+                <p>Endereço: Rua das Pizzas, 123</p>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold mb-4">Redes Sociais</h3>
+                <div className="flex space-x-4">
+                  <a href="#" className="hover:text-green-500">Instagram</a>
+                  <a href="#" className="hover:text-green-500">Facebook</a>
+                  <a href="#" className="hover:text-green-500">Twitter</a>
+                </div>
               </div>
             </div>
+            <div className="border-t mt-8 pt-8 text-center">
+              <p>&copy; 2024 Pizzamar. Todos os direitos reservados.</p>
+            </div>
           </div>
-          <div className="border-t mt-8 pt-8 text-center">
-            <p>&copy; 2024 Pizzaria Delícia. Todos os direitos reservados.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
+        </footer>
+      </div>
+    </AppContext.Provider>
   );
 };
 
